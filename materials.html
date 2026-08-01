@@ -1,0 +1,365 @@
+<!-- TradeSquare — Material Tally (AI price lookup, uses the same Claude proxy) -->
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>TradeSquare — Material Tally</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Barlow:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{--graphite:#0E1116;--ink:#1B2029;--bg:#F3F5F6;--panel:#FFFFFF;--steel:#6B7580;--line:#DDE1E4;--orange:#FF5A1F;--orange-deep:#D8410F;--caution:#F2C230;
+    --disp:"Oswald","Arial Narrow",sans-serif;--body:"Barlow",system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,monospace;}
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+  ::selection{background:var(--orange);color:#fff;}
+  :focus-visible{outline:2px solid var(--orange);outline-offset:1px;}
+  .bar{display:flex;align-items:center;justify-content:space-between;padding:14px clamp(16px,4vw,32px);}
+  .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--graphite);}
+  .brand-sq{width:26px;height:26px;position:relative;flex:none;border:3px solid var(--orange);border-right:none;border-bottom:none;}
+  .brand-sq::after{content:"";position:absolute;right:-3px;bottom:-3px;width:12px;height:12px;background:var(--orange);}
+  .brand-name{font-family:var(--disp);font-weight:700;font-size:21px;letter-spacing:.02em;text-transform:uppercase;line-height:1;}
+  .brand-name b{color:var(--orange);}
+  .bar-right{display:flex;gap:8px;align-items:center;}
+  .btn{cursor:pointer;font-family:var(--body);font-weight:600;font-size:14px;padding:9px 15px;border-radius:20px;border:1.5px solid var(--line);background:transparent;color:var(--graphite);text-decoration:none;}
+  .btn:hover{border-color:var(--graphite);}
+  .btn.solid{background:var(--orange);border-color:var(--orange);color:#fff;}
+  .btn.solid:hover{background:var(--orange-deep);border-color:var(--orange-deep);}
+  .wrap{max-width:840px;margin:0 auto;padding:8px clamp(12px,3vw,20px) 60px;}
+
+  .lookup{background:var(--graphite);border-radius:18px;padding:18px;margin-bottom:22px;color:#fff;}
+  .lookup h2{font-family:var(--body);font-weight:700;font-size:17px;margin:0 0 4px;display:flex;align-items:center;gap:8px;}
+  .lookup .dot{width:8px;height:8px;border-radius:50%;background:var(--caution);}
+  .lookup p{margin:0 0 12px;font-size:13.5px;color:#B7BEC5;}
+  .lu-row{display:flex;gap:8px;}
+  #query{flex:1;border:none;border-radius:12px;font-family:var(--body);font-size:15px;padding:13px 14px;background:#fff;color:var(--ink);outline:none;}
+  .lu-btn{flex:none;border:none;border-radius:12px;cursor:pointer;background:var(--orange);color:#fff;font-family:var(--body);font-weight:700;font-size:14px;padding:0 18px;}
+  .lu-btn:hover{background:var(--orange-deep);}
+  .lu-btn:disabled{background:var(--steel);cursor:not-allowed;}
+  .lu-mic{flex:none;border:none;border-radius:12px;cursor:pointer;background:#2A323B;color:#fff;font-size:16px;width:46px;line-height:0;display:flex;align-items:center;justify-content:center;}
+  .lu-mic:hover{background:#39424D;}
+  .lu-mic.on{background:var(--orange);animation:micpulse 1.2s ease-in-out infinite;}
+  .lu-mic[hidden]{display:none;}
+  @keyframes micpulse{0%,100%{box-shadow:0 0 0 0 rgba(255,90,31,.5);}50%{box-shadow:0 0 0 8px rgba(255,90,31,0);}}
+  .lu-opts{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:12.5px;color:#B7BEC5;}
+  .lu-opts input{accent-color:var(--orange);}
+  .examples{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;}
+  .ex{background:transparent;border:1px solid #3A424C;border-radius:16px;color:#C6CDD3;font-family:var(--mono);font-size:11.5px;padding:6px 11px;cursor:pointer;}
+  .ex:hover{border-color:var(--orange);color:#fff;}
+  .result{background:#12171E;border:1px solid #2A323B;border-radius:12px;padding:14px 16px;margin-top:14px;display:none;}
+  .result.show{display:block;}
+  .result .sum{font-size:14px;color:#E6EAED;margin:0 0 12px;line-height:1.5;}
+  .result .price{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+  .result .price .big{font-family:var(--disp);font-weight:700;font-size:26px;color:#fff;}
+  .result .price .meta{font-family:var(--mono);font-size:12px;color:#8A93A0;}
+  .result .add{background:var(--orange);border:none;border-radius:10px;color:#fff;font-family:var(--body);font-weight:700;font-size:14px;padding:10px 16px;cursor:pointer;}
+  .result .add:hover{background:var(--orange-deep);}
+  .result .add.alt{background:transparent;border:1.5px solid #3A424C;margin-left:8px;}
+  .result .add.alt:hover{background:transparent;border-color:var(--orange);color:var(--orange);}
+  .lu-status{font-family:var(--mono);font-size:11px;color:#B7BEC5;margin-top:10px;min-height:14px;}
+
+  .paper{background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:0 4px 20px rgba(14,17,22,.06);padding:clamp(20px,4vw,36px);}
+  .head{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;border-bottom:2px solid var(--graphite);padding-bottom:16px;margin-bottom:18px;}
+  .head .word{font-family:var(--disp);font-weight:700;font-size:30px;text-transform:uppercase;color:var(--orange);line-height:.9;}
+  .head .sub{font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--steel);text-transform:uppercase;margin-top:4px;}
+  .fields{display:flex;flex-direction:column;gap:6px;min-width:220px;}
+  .fld{display:flex;gap:8px;align-items:center;justify-content:flex-end;font-size:13px;}
+  .fld label{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--steel);}
+  .fld input{width:170px;border:1px solid var(--line);border-radius:8px;padding:7px 9px;font-size:14px;outline:none;}
+  .fld input:focus{border-color:var(--graphite);}
+  table{width:100%;border-collapse:collapse;}
+  thead th{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--steel);text-align:left;padding:8px 8px;border-bottom:1.5px solid var(--graphite);}
+  thead th.num,thead th.amt{text-align:right;}
+  tbody td{padding:5px 6px;border-bottom:1px solid var(--line);vertical-align:middle;}
+  tbody td input{width:100%;border:none;background:transparent;font-size:14px;padding:6px 4px;outline:none;border-radius:6px;}
+  tbody td input:focus{background:#F4F6F7;}
+  td.desc input{font-weight:500;}
+  td.num input,td.rate input{text-align:right;}
+  td.amt{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:600;}
+  td.rm{width:26px;text-align:center;}
+  td.rm button{background:none;border:none;color:var(--steel);cursor:pointer;font-size:15px;line-height:1;padding:2px 4px;border-radius:6px;}
+  td.rm button:hover{color:var(--orange-deep);background:#F4F6F7;}
+  .addrow{margin-top:10px;background:transparent;border:1.5px dashed var(--line);border-radius:10px;cursor:pointer;font-family:var(--body);font-weight:600;font-size:13px;color:var(--steel);padding:9px 14px;width:100%;}
+  .addrow:hover{border-color:var(--orange);color:var(--orange-deep);}
+  .totals{display:flex;justify-content:flex-end;margin-top:18px;}
+  .totals .tbl{width:300px;max-width:100%;}
+  .trow{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:14px;}
+  .trow .lbl{color:var(--steel);}
+  .trow.total{border-top:2px solid var(--graphite);margin-top:6px;padding-top:12px;font-family:var(--disp);font-weight:700;font-size:22px;text-transform:uppercase;color:var(--graphite);}
+  .trow.total .val{color:var(--orange-deep);}
+  .pctin{width:52px;text-align:right;border:1px solid var(--line);border-radius:6px;padding:3px 6px;font-size:13px;}
+  .val{font-variant-numeric:tabular-nums;}
+  .notes{margin-top:22px;border-top:1px solid var(--line);padding-top:14px;}
+  .notes .lbl{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--steel);margin-bottom:6px;}
+  .notes textarea{width:100%;border:1px solid var(--line);border-radius:8px;resize:none;font-size:14px;padding:10px 12px;line-height:1.5;min-height:56px;background:#fff;}
+  .madein{text-align:center;font-family:var(--mono);font-size:10.5px;color:var(--steel);margin-top:20px;letter-spacing:.04em;}
+  @media print{
+    @page{margin:14mm;}
+    body{background:#fff;}.no-print{display:none !important;}
+    .wrap{max-width:100%;padding:0;}.paper{border:none;box-shadow:none;border-radius:0;padding:0;}
+    .fld input,.notes textarea,tbody td input{border-color:transparent !important;background:transparent !important;}
+    .addrow,td.rm{display:none !important;}.pctin{border:none;}
+  }
+  .sv-overlay{position:fixed;inset:0;background:rgba(10,12,15,.55);z-index:70;display:none;align-items:center;justify-content:center;padding:20px;}
+  .sv-overlay.open{display:flex;}
+  .sv-modal{background:var(--panel);border-radius:18px;max-width:460px;width:100%;max-height:80vh;overflow:auto;padding:24px;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.3);}
+  .sv-modal h2{font-family:var(--body);font-weight:700;font-size:20px;margin:0 0 16px;}
+  .sv-close{position:absolute;top:12px;right:14px;background:none;border:none;font-size:22px;cursor:pointer;color:var(--steel);}
+  .sv-item{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px;}
+  .sv-item .t{font-weight:600;font-size:15px;}
+  .sv-item .m{font-family:var(--mono);font-size:11px;color:var(--steel);margin-top:3px;}
+  .sv-item .acts{display:flex;gap:8px;margin-top:10px;}
+  .sv-item .acts button{cursor:pointer;font-family:var(--body);font-weight:600;font-size:13px;padding:7px 12px;border-radius:16px;border:1.5px solid var(--line);background:transparent;color:var(--graphite);}
+  .sv-item .acts button.load{background:var(--orange);border-color:var(--orange);color:#fff;}
+  .sv-empty{color:var(--steel);font-size:14px;text-align:center;padding:24px;}
+  .sv-toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);background:var(--graphite);color:#fff;font-family:var(--mono);font-size:12px;padding:11px 16px;border-radius:10px;border-left:4px solid var(--orange);opacity:0;visibility:hidden;transition:opacity .2s,transform .2s,visibility .2s;z-index:80;}
+  .sv-toast.show{opacity:1;visibility:visible;transform:translate(-50%,0);}
+</style>
+
+<div class="bar no-print">
+  <a class="brand" href="/" aria-label="TradeSquare home">
+    <span class="brand-sq" aria-hidden="true"></span><span class="brand-name">TRADE<b>SQUARE</b></span>
+  </a>
+  <div class="bar-right">
+    <button class="btn" id="savedBtn" type="button">📁 Saved</button>
+    <button class="btn" id="saveBtn" type="button">💾 Save</button>
+    <a class="btn" href="/">← App</a>
+    <button class="btn solid" id="printBtn" type="button">⤓ Print / Save PDF</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="lookup no-print">
+    <h2><span class="dot" aria-hidden="true"></span>Material price lookup</h2>
+    <p>Ask for a material and TradeSquare finds a current U.S. retail price, then drops it into your list. Same AI as the search box.</p>
+    <div class="lu-row">
+      <input id="query" placeholder="e.g. price of a 2x4x8 stud" aria-label="Material to price" />
+      <button class="lu-mic" id="micBtn" type="button" aria-label="Voice search" title="Speak">🎤</button>
+      <button class="lu-btn" id="searchBtn" type="button">Search</button>
+    </div>
+    <label class="lu-opts"><input type="checkbox" id="webToggle" checked /> Web search (live prices — costs a little more per lookup)</label>
+    <div class="examples" id="examples"></div>
+    <div class="result" id="result">
+      <p class="sum" id="resSum"></p>
+      <div class="price"><span class="big" id="resPrice"></span><span class="meta" id="resMeta"></span></div>
+      <button class="add" id="addBtn" type="button">＋ Add to list</button>
+      <button class="add alt" id="toInvBtn" type="button">→ To Invoice</button>
+    </div>
+    <p class="lu-status" id="luStatus"></p>
+  </div>
+
+  <div class="paper" id="paper">
+    <div class="head">
+      <div><div class="word">Material Tally</div><div class="sub">Estimate</div></div>
+      <div class="fields">
+        <div class="fld"><label for="proj">Project</label><input id="proj" placeholder="Job / project" /></div>
+        <div class="fld"><label for="client">Client</label><input id="client" placeholder="Client name" /></div>
+        <div class="fld"><label for="company">From</label><input id="company" placeholder="Your company" /></div>
+      </div>
+    </div>
+    <table>
+      <thead><tr><th>Material</th><th class="num">Qty</th><th>Unit</th><th class="num">Unit price</th><th class="amt">Line total</th><th class="no-print"></th></tr></thead>
+      <tbody id="items"></tbody>
+    </table>
+    <button class="addrow no-print" id="addRow" type="button">＋ Add material manually</button>
+    <div class="totals">
+      <div class="tbl">
+        <div class="trow"><span class="lbl">Materials subtotal</span><span class="val" id="subtotal">$0.00</span></div>
+        <div class="trow"><span class="lbl">Markup <input class="pctin no-print" id="markupPct" type="number" value="0" min="0" step="1" />%</span><span class="val" id="markupAmt">$0.00</span></div>
+        <div class="trow"><span class="lbl">Tax <input class="pctin no-print" id="taxPct" type="number" value="0" min="0" step="0.1" />%</span><span class="val" id="taxAmt">$0.00</span></div>
+        <div class="trow total"><span>Total</span><span class="val" id="total">$0.00</span></div>
+      </div>
+    </div>
+    <div class="no-print" style="text-align:right;margin-top:14px;">
+      <button class="btn solid" id="listToInv" type="button">→ Turn this into an Invoice</button>
+    </div>
+    <div class="notes"><div class="lbl">Notes</div><textarea id="notes" placeholder="Prices are estimates — confirm with your supplier before ordering.">Material prices are estimates and subject to change. Confirm with your supplier before ordering.</textarea></div>
+    <div class="madein">Made with TradeSquare · Measure twice. Ask once.</div>
+  </div>
+</div>
+
+<div class="sv-overlay" id="svOverlay" aria-hidden="true"><div class="sv-modal" role="dialog" aria-modal="true" aria-label="Saved materials lists">
+  <button class="sv-close" id="svClose" type="button" aria-label="Close">✕</button>
+  <h2>Saved materials lists</h2>
+  <div id="svList"></div>
+</div></div>
+<div class="sv-toast" id="svToast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  "use strict";
+  var AI_ENDPOINT='/.netlify/functions/ask';
+  var SYSTEM_PRICE='You are a materials price lookup for building-trade contractors in the United States. '
+    +'Given a material request, work out: the material name, the quantity asked about (assume 1 if none stated), a sensible unit (sheet, bag, gallon, each, linear ft, sq ft, board, stud, box, roll, ton, bundle), the price per unit in US dollars at major retailers like Home Depot or Lowes or a relevant supplier, and the total for that quantity. '
+    +'If a web search tool is available, use it for current pricing. Otherwise give your best current US retail estimate. '
+    +'Write a short 1-2 sentence plain-language summary for a contractor. '
+    +'Then on the very last line output ONLY this exact format with nothing after it: '
+    +'PRICE_JSON:{"item":"material name","quantity":number,"unit":"unit","unitPrice":number,"totalPrice":number,"source":"retailer or site"}';
+
+  var EXAMPLES=['price of a 2x4x8 stud','cost of 5 sheets of 1/2 inch sheetrock','price of a bag of ready-mix concrete','pressure-treated 2x8x12 joist','5 lb box of deck screws'];
+
+  var query=document.getElementById('query'),searchBtn=document.getElementById('searchBtn'),webToggle=document.getElementById('webToggle'),
+      result=document.getElementById('result'),resSum=document.getElementById('resSum'),resPrice=document.getElementById('resPrice'),
+      resMeta=document.getElementById('resMeta'),addBtn=document.getElementById('addBtn'),luStatus=document.getElementById('luStatus'),
+      items=document.getElementById('items'),examples=document.getElementById('examples');
+  var lastFound=null;
+
+  EXAMPLES.forEach(function(x){var b=document.createElement('button');b.className='ex';b.type='button';b.textContent=x;b.addEventListener('click',function(){query.value=x;doSearch();});examples.appendChild(b);});
+
+  function money(n){return '$'+(isFinite(n)?n:0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}
+  function escAttr(s){return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+
+  function row(name,qty,unit,price){
+    var tr=document.createElement('tr');
+    tr.innerHTML='<td class="desc"><input value="'+escAttr(name||'')+'" placeholder="Material"></td>'
+      +'<td class="num"><input type="number" step="any" value="'+(qty!=null?qty:'')+'" placeholder="0"></td>'
+      +'<td class="unit"><input value="'+escAttr(unit||'')+'" placeholder="ea" style="width:56px"></td>'
+      +'<td class="rate"><input type="number" step="any" value="'+(price!=null?price:'')+'" placeholder="0.00"></td>'
+      +'<td class="amt">$0.00</td><td class="rm no-print"><button type="button" title="Remove">✕</button></td>';
+    items.appendChild(tr);recalc();
+  }
+  function recalc(){
+    var subtotal=0;
+    Array.prototype.forEach.call(items.querySelectorAll('tr'),function(tr){
+      var q=parseFloat(tr.querySelector('.num input').value)||0,r=parseFloat(tr.querySelector('.rate input').value)||0,amt=q*r;
+      subtotal+=amt;tr.querySelector('.amt').textContent=money(amt);});
+    var mk=(parseFloat(document.getElementById('markupPct').value)||0)/100*subtotal;
+    var taxable=subtotal+mk;
+    var tx=(parseFloat(document.getElementById('taxPct').value)||0)/100*taxable;
+    document.getElementById('subtotal').textContent=money(subtotal);
+    document.getElementById('markupAmt').textContent=money(mk);
+    document.getElementById('taxAmt').textContent=money(tx);
+    document.getElementById('total').textContent=money(taxable+tx);
+  }
+  items.addEventListener('input',recalc);
+  document.getElementById('markupPct').addEventListener('input',recalc);
+  document.getElementById('taxPct').addEventListener('input',recalc);
+  items.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('.rm button');if(b){b.closest('tr').remove();recalc();}});
+  document.getElementById('addRow').addEventListener('click',function(){row('',null,'',null);});
+  document.getElementById('printBtn').addEventListener('click',function(){window.print();});
+
+  searchBtn.addEventListener('click',doSearch);
+  query.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();doSearch();}});
+  addBtn.addEventListener('click',function(){if(lastFound){row(lastFound.item,lastFound.quantity,lastFound.unit,lastFound.unitPrice);luStatus.textContent='Added to your list.';result.classList.remove('show');lastFound=null;}});
+
+  function sendToInvoice(list){
+    if(!list||!list.length){luStatus.textContent='Nothing to send yet.';return;}
+    window.location.href='/invoice.html?items='+encodeURIComponent(JSON.stringify(list));
+  }
+  function currentList(){
+    var out=[];
+    Array.prototype.forEach.call(items.querySelectorAll('tr'),function(tr){
+      var name=tr.querySelector('.desc input').value.trim();
+      var q=parseFloat(tr.querySelector('.num input').value)||0;
+      var u=tr.querySelector('.unit input').value.trim();
+      var r=parseFloat(tr.querySelector('.rate input').value)||0;
+      if(name||q||r)out.push({description:name,quantity:q,unit:u,rate:r});
+    });
+    return out;
+  }
+  document.getElementById('toInvBtn').addEventListener('click',function(){
+    if(!lastFound)return;
+    sendToInvoice([{description:lastFound.item,quantity:lastFound.quantity,unit:lastFound.unit,rate:lastFound.unitPrice}]);
+  });
+  document.getElementById('listToInv').addEventListener('click',function(){
+    var list=currentList();
+    if(!list.length){luStatus.textContent='Add some materials first, then send them to an invoice.';return;}
+    sendToInvoice(list);
+  });
+
+  function doSearch(){
+    var q=(query.value||'').trim();if(!q){luStatus.textContent='Type a material first.';return;}
+    searchBtn.disabled=true;result.classList.remove('show');luStatus.textContent='Searching current pricing…';
+    var body={system:SYSTEM_PRICE,messages:[{role:'user',content:q}]};
+    if(webToggle.checked)body.tools=[{type:'web_search_20250305',name:'web_search'}];
+    fetch(AI_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})
+      .then(function(r){return r.json();})
+      .then(function(d){
+        searchBtn.disabled=false;
+        if(d&&d.error){luStatus.textContent='Lookup error — '+((d.error.message)||d.error)+'.';return;}
+        var text=(d&&d.text)||'';
+        var summary=text.split('PRICE_JSON:')[0].trim();
+        var m=text.match(/PRICE_JSON:\s*(\{[^{}]*\})/);
+        if(!m){luStatus.textContent='';resSum.textContent=summary||'No clean price found — add it manually below.';resPrice.textContent='';resMeta.textContent='';addBtn.style.display='none';result.classList.add('show');return;}
+        var p;try{p=JSON.parse(m[1].replace(/```json|```/g,'').trim());}catch(e){luStatus.textContent='Could not read the price — add it manually.';return;}
+        lastFound={item:p.item||q,quantity:Number(p.quantity)||1,unit:p.unit||'ea',unitPrice:Number(p.unitPrice)||0};
+        resSum.textContent=summary||('Found pricing for '+lastFound.item+'.');
+        resPrice.textContent=money(lastFound.unitPrice)+' / '+lastFound.unit;
+        resMeta.textContent=(p.source?('· '+p.source):'')+' · qty '+lastFound.quantity+' = '+money(lastFound.unitPrice*lastFound.quantity);
+        addBtn.style.display='';luStatus.textContent='';result.classList.add('show');
+      })
+      .catch(function(){searchBtn.disabled=false;luStatus.textContent='Could not reach the lookup service — try again.';});
+  }
+
+  row('',null,'',null);row('',null,'',null);
+
+  (function(){
+    var SR=window.SpeechRecognition||window.webkitSpeechRecognition;var micBtn=document.getElementById('micBtn');
+    if(!SR||!micBtn){if(micBtn)micBtn.hidden=true;return;}
+    var rec=new SR();rec.lang='en-US';rec.interimResults=true;rec.continuous=false;var listening=false,base='';
+    micBtn.addEventListener('click',function(){if(searchBtn.disabled)return;if(listening){try{rec.stop();}catch(e){}return;}base=(query.value||'').trim();try{rec.start();}catch(e){}});
+    rec.onstart=function(){listening=true;micBtn.classList.add('on');};
+    rec.onend=function(){listening=false;micBtn.classList.remove('on');query.focus();};
+    rec.onerror=function(e){listening=false;micBtn.classList.remove('on');if(e&&e.error==='not-allowed')alert('Microphone is blocked. Allow mic access for this site to use voice.');};
+    rec.onresult=function(e){var t='';for(var i=0;i<e.results.length;i++)t+=e.results[i][0].transcript;query.value=(base?base+' ':'')+t;};
+  })();
+
+  // ---------- save / load to Supabase ----------
+  var SB_URL='https://tbmxxlngxyxprqfwyudm.supabase.co';
+  var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRibXh4bG5neHl4cHJxZnd5dWRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2MzU1NTEsImV4cCI6MjA5OTIxMTU1MX0.MVjIfxsPQrsa5788gZt0Mu1BC9O2XEnaP6NcXv_Avyc';
+  var sb=(window.supabase)?window.supabase.createClient(SB_URL,SB_KEY):null;
+  var currentUser=null;
+  var svToast=document.getElementById('svToast'),svOverlay=document.getElementById('svOverlay'),svList=document.getElementById('svList');
+  function toast(m){svToast.textContent=m;svToast.classList.add('show');setTimeout(function(){svToast.classList.remove('show');},2200);}
+  if(sb){sb.auth.getSession().then(function(r){currentUser=(r.data.session&&r.data.session.user)||null;});sb.auth.onAuthStateChange(function(_e,s){currentUser=(s&&s.user)||null;});}
+  function numOrNull(v){var n=parseFloat(v);return isFinite(n)?n:null;}
+  function totalNumber(){return parseFloat((document.getElementById('total').textContent||'0').replace(/[^0-9.]/g,''))||0;}
+  function gather(){
+    var rows=[];
+    Array.prototype.forEach.call(items.querySelectorAll('tr'),function(tr){
+      rows.push({description:tr.querySelector('.desc input').value,quantity:tr.querySelector('.num input').value,unit:tr.querySelector('.unit input').value,rate:tr.querySelector('.rate input').value});
+    });
+    return {project:document.getElementById('proj').value,client:document.getElementById('client').value,company:document.getElementById('company').value,markupPct:document.getElementById('markupPct').value,taxPct:document.getElementById('taxPct').value,notes:document.getElementById('notes').value,rows:rows};
+  }
+  function populate(data){
+    if(!data)return;
+    document.getElementById('proj').value=data.project||'';
+    document.getElementById('client').value=data.client||'';
+    document.getElementById('company').value=data.company||'';
+    document.getElementById('markupPct').value=data.markupPct||0;
+    document.getElementById('taxPct').value=data.taxPct||0;
+    document.getElementById('notes').value=data.notes||'';
+    items.innerHTML='';(data.rows||[]).forEach(function(r){row(r.description||'',numOrNull(r.quantity),r.unit||'',numOrNull(r.rate));});
+    if(!items.querySelector('tr'))row('',null,'',null);
+    recalc();
+  }
+  function escq(s){return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+  function saveList(){
+    if(!sb||!currentUser){toast('Log in on the app to save');return;}
+    var data=gather();
+    sb.from('materials_lists').insert({user_id:currentUser.id,name:data.project||'Materials list',total:totalNumber(),data:data})
+      .then(function(res){toast(res&&res.error?'Save failed':'Materials list saved ✓');},function(){toast('Save failed');});
+  }
+  var savedList=[];
+  function openSaved(){
+    if(!sb||!currentUser){toast('Log in on the app to save');return;}
+    svList.innerHTML='<div class="sv-empty">Loading…</div>';svOverlay.classList.add('open');
+    sb.from('materials_lists').select('id,name,total,created_at').order('created_at',{ascending:false}).limit(100)
+      .then(function(res){savedList=(res&&res.data)||[];renderSaved();},function(){svList.innerHTML='<div class="sv-empty">Could not load.</div>';});
+  }
+  function closeSaved(){svOverlay.classList.remove('open');}
+  function renderSaved(){
+    if(!savedList.length){svList.innerHTML='<div class="sv-empty">No saved lists yet.</div>';return;}
+    var h='';for(var i=0;i<savedList.length;i++){var s=savedList[i];var d=s.created_at?new Date(s.created_at).toLocaleDateString():'';
+      h+='<div class="sv-item"><div class="t">'+escq(s.name||'Materials list')+'</div><div class="m">'+d+' · $'+(Number(s.total)||0).toFixed(2)+'</div>'
+        +'<div class="acts"><button class="load" data-load="'+escq(String(s.id))+'" type="button">Load</button><button data-del="'+escq(String(s.id))+'" type="button">Delete</button></div></div>';}
+    svList.innerHTML=h;
+  }
+  function loadSaved(id){sb.from('materials_lists').select('data').eq('id',id).single().then(function(res){if(res&&res.data){populate(res.data.data);closeSaved();toast('List loaded');}},function(){toast('Load failed');});}
+  function delSaved(id){sb.from('materials_lists').delete().eq('id',id).then(function(){openSaved();},function(){});}
+  document.getElementById('saveBtn').addEventListener('click',saveList);
+  document.getElementById('savedBtn').addEventListener('click',openSaved);
+  document.getElementById('svClose').addEventListener('click',closeSaved);
+  svOverlay.addEventListener('click',function(e){if(e.target===svOverlay)closeSaved();});
+  svList.addEventListener('click',function(e){var l=e.target.closest&&e.target.closest('[data-load]');if(l){loadSaved(l.getAttribute('data-load'));return;}var d=e.target.closest&&e.target.closest('[data-del]');if(d){delSaved(d.getAttribute('data-del'));return;}});
+})();
+</script>
