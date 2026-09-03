@@ -1,0 +1,176 @@
+<!-- TradeSquare — pricing -->
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>TradeSquare — Plans &amp; Pricing</title>
+<meta name="description" content="TradeSquare plans: Apprentice (free), Journeyman $19/mo unlimited answers, and Master $49/mo with AI plan takeoffs. No contract, cancel anytime." />
+<meta name="robots" content="index, follow" />
+<meta name="theme-color" content="#0E1116" />
+<link rel="canonical" href="https://tradesqai.com/pricing.html" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="TradeSquare" />
+<meta property="og:title" content="TradeSquare — Plans &amp; Pricing" />
+<meta property="og:description" content="TradeSquare plans: Apprentice (free), Journeyman $19/mo unlimited answers, and Master $49/mo with AI plan takeoffs. No contract, cancel anytime." />
+<meta property="og:url" content="https://tradesqai.com/pricing.html" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="TradeSquare — Plans &amp; Pricing" />
+<meta name="twitter:description" content="TradeSquare plans: Apprentice (free), Journeyman $19/mo unlimited answers, and Master $49/mo with AI plan takeoffs. No contract, cancel anytime." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Barlow:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root{--graphite:#0E1116;--ink:#161B22;--bg:#EDF0F1;--panel:#FBFCFC;--steel:#66707B;--steel-line:#C2C8CD;--orange:#FF5A1F;--orange-deep:#D8410F;--caution:#F2C230;
+    --disp:"Oswald","Arial Narrow",sans-serif;--body:"Barlow",system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,monospace;}
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+  ::selection{background:var(--orange);color:#fff;}
+  :focus-visible{outline:3px solid var(--orange);outline-offset:2px;}
+  .bar{display:flex;align-items:center;justify-content:space-between;padding:16px clamp(16px,4vw,36px);}
+  .brand{display:flex;align-items:center;gap:11px;text-decoration:none;color:var(--graphite);}
+  .brand-sq{width:28px;height:28px;position:relative;flex:none;border:3px solid var(--orange);border-right:none;border-bottom:none;}
+  .brand-sq::after{content:"";position:absolute;right:-3px;bottom:-3px;width:13px;height:13px;background:var(--orange);}
+  .brand-name{font-family:var(--disp);font-weight:700;font-size:23px;letter-spacing:.02em;text-transform:uppercase;line-height:1;}
+  .brand-name b{color:var(--orange);}
+  .back{color:var(--graphite);text-decoration:none;font-family:var(--disp);font-weight:500;font-size:15px;letter-spacing:.04em;text-transform:uppercase;padding:8px 14px;border:1.5px solid var(--steel-line);}
+  .back:hover{border-color:var(--graphite);}
+  .wrap{max-width:1080px;margin:0 auto;padding:clamp(24px,5vw,56px) clamp(16px,4vw,36px) 60px;}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--orange-deep);display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+  .eyebrow::before{content:"";width:30px;height:2px;background:var(--orange-deep);}
+  h1{font-family:var(--disp);font-weight:700;text-transform:uppercase;font-size:clamp(32px,5vw,52px);line-height:.98;margin:0 0 10px;letter-spacing:.01em;color:var(--graphite);}
+  .sub{color:var(--steel);max-width:620px;margin:0 0 24px;}
+  .bill-toggle{display:inline-flex;border:2px solid var(--graphite);margin:0 0 36px;background:var(--panel);}
+  .bill-opt{background:transparent;border:none;cursor:pointer;font-family:var(--disp);font-weight:500;text-transform:uppercase;letter-spacing:.03em;font-size:15px;padding:10px 20px;color:var(--graphite);display:flex;align-items:center;gap:9px;transition:all .12s;}
+  .bill-opt.active{background:var(--graphite);color:#fff;}
+  .bill-opt .save{font-family:var(--mono);font-size:10px;letter-spacing:.05em;background:var(--orange);color:#fff;padding:2px 6px;text-transform:uppercase;}
+  .bill-opt.active .save{background:var(--caution);color:var(--graphite);}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(268px,1fr));gap:16px;align-items:start;}
+  .card{background:var(--panel);border:1.5px solid var(--steel-line);padding:26px 24px;display:flex;flex-direction:column;position:relative;}
+  .card.featured{border:2px solid var(--orange);box-shadow:8px 8px 0 rgba(255,90,31,.16);}
+  .ribbon{position:absolute;top:0;right:0;background:var(--orange);color:#fff;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;padding:5px 10px;}
+  .card h3{font-family:var(--disp);font-weight:700;text-transform:uppercase;font-size:27px;letter-spacing:.02em;margin:0;line-height:1;color:var(--graphite);}
+  .tag{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--steel);margin:6px 0 0;}
+  .amt{display:flex;align-items:baseline;margin:20px 0 4px;color:var(--graphite);}
+  .amt .cur{font-family:var(--disp);font-weight:600;font-size:26px;}
+  .amt .num{font-family:var(--disp);font-weight:700;font-size:56px;line-height:.85;letter-spacing:.01em;}
+  .amt .per{font-family:var(--mono);font-size:13px;color:var(--steel);margin-left:6px;}
+  .note{font-family:var(--mono);font-size:11px;color:var(--steel);margin:0 0 18px;min-height:14px;letter-spacing:.04em;}
+  .note b{color:var(--orange-deep);}
+  .feat{list-style:none;margin:0 0 22px;padding:16px 0 0;flex:1;border-top:1px dashed var(--steel-line);}
+  .feat li{position:relative;padding-left:24px;margin-bottom:10px;font-size:15px;line-height:1.35;}
+  .feat li::before{content:"";position:absolute;left:0;top:6px;width:12px;height:12px;background:var(--orange);clip-path:polygon(0 0,100% 0,100% 100%);}
+  .cta{cursor:pointer;font-family:var(--disp);font-weight:600;text-transform:uppercase;letter-spacing:.04em;font-size:17px;padding:13px;border:2px solid var(--graphite);background:var(--graphite);color:#fff;transition:all .12s;width:100%;}
+  .cta:hover{background:var(--orange-deep);border-color:var(--orange-deep);}
+  .cta.primary{background:var(--orange);border-color:var(--orange);}
+  .cta.primary:hover{background:var(--orange-deep);border-color:var(--orange-deep);}
+  .cta.ghost{background:transparent;color:var(--graphite);}
+  .cta.ghost:hover{background:var(--graphite);color:#fff;}
+  .paypal-slot{margin-top:auto;}.paypal-slot:empty{display:none;}
+  .foot{font-family:var(--mono);font-size:12px;color:var(--steel);margin:28px 0 0;letter-spacing:.03em;}
+  .toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);z-index:60;background:var(--graphite);color:#fff;font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:12px 18px;border-left:4px solid var(--orange);box-shadow:0 8px 24px rgba(0,0,0,.3);opacity:0;visibility:hidden;transition:opacity .2s,transform .2s,visibility .2s;}
+  .toast.show{opacity:1;visibility:visible;transform:translate(-50%,0);}
+</style>
+
+<div class="bar">
+  <a class="brand" href="/app" aria-label="TradeSquare home">
+    <span class="brand-sq" aria-hidden="true"></span>
+    <span class="brand-name">TRADE<b>SQUARE</b></span>
+  </a>
+  <a class="back" href="/app">← Back to app</a>
+</div>
+
+<div class="wrap">
+  <p class="eyebrow">Price it out</p>
+  <h1>Plans that pull<br>their weight</h1>
+  <p class="sub">No contract, cancel any time. One good answer pays for the month. Pick your ticket:</p>
+
+  <div class="bill-toggle" role="tablist" aria-label="Billing period">
+    <button class="bill-opt active" id="billMonthly" type="button">Monthly</button>
+    <button class="bill-opt" id="billAnnual" type="button">Annual <span class="save">2 mo free</span></button>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h3>Apprentice</h3><p class="tag">Kick the tires</p>
+      <div class="amt"><span class="cur">$</span><span class="num">0</span><span class="per">/free</span></div>
+      <p class="note">No card. No clock.</p>
+      <ul class="feat"><li>5 questions a day</li><li>All six trades + code call-outs</li><li>Clip up to 10 answers</li><li>Session clipboard</li></ul>
+      <button class="cta ghost" type="button" data-plan="Apprentice" data-free="1">Start free</button>
+    </div>
+    <div class="card featured">
+      <span class="ribbon">Most picked</span>
+      <h3>Journeyman</h3><p class="tag">The daily driver</p>
+      <div class="amt" data-m="19" data-a="190"><span class="cur">$</span><span class="num">19</span><span class="per">/mo</span></div>
+      <p class="note js-note">Billed monthly</p>
+      <ul class="feat"><li>Unlimited questions, all day</li><li>Threads that remember the job</li><li>Unlimited clipboard + export</li><li>Priority answers — no waiting</li><li>Wire, pipe, span &amp; load look-ups</li></ul>
+      <div class="paypal-slot" data-plan="Journeyman"></div>
+      <button class="cta primary" type="button" data-plan="Journeyman">Get to work</button>
+    </div>
+    <div class="card">
+      <h3>Master</h3><p class="tag">Run the crew</p>
+      <div class="amt" data-m="49" data-a="490"><span class="cur">$</span><span class="num">49</span><span class="per">/mo</span></div>
+      <p class="note js-note">Billed monthly</p>
+      <ul class="feat"><li>Everything in Journeyman</li><li>Up to 5 crew seats</li><li>Shared clipboards &amp; job folders</li><li>Invoice-ready exports</li><li>Permit &amp; takeoff helpers</li><li>Front-of-line support</li></ul>
+      <div class="paypal-slot" data-plan="Master"></div>
+      <button class="cta" type="button" data-plan="Master">Kit out the crew</button>
+    </div>
+  </div>
+  <p class="foot">🔒 Secure checkout with PayPal. Cheaper than one wasted callback — answers are guidance, not a stamp, so always verify against local code.</p>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"><span id="toastMsg">Copied</span></div>
+
+<script>
+(function(){
+  "use strict";
+  /* ===== PayPal — set your Client ID (developer.paypal.com) ===== */
+  var PAYPAL_CLIENT_ID='YOUR-PAYPAL-CLIENT-ID';
+  var PAYPAL_ME='YOUR-PAYPAL-HANDLE';
+  var PAYPAL_CURRENCY='USD';
+
+  var billing='monthly';
+  var billMonthly=document.getElementById('billMonthly'),billAnnual=document.getElementById('billAnnual');
+  var toastEl=document.getElementById('toast'),toastMsg=document.getElementById('toastMsg'),toastTimer=null;
+  function toast(m){toastMsg.textContent=m;toastEl.classList.add('show');if(toastTimer)clearTimeout(toastTimer);toastTimer=setTimeout(function(){toastEl.classList.remove('show');},2100);}
+
+  function renderPrices(){
+    var annual=billing==='annual';
+    billMonthly.classList.toggle('active',!annual);billAnnual.classList.toggle('active',annual);
+    var cards=document.querySelectorAll('.amt[data-m]');
+    for(var i=0;i<cards.length;i++){var m=parseInt(cards[i].getAttribute('data-m'),10),a=parseInt(cards[i].getAttribute('data-a'),10);
+      var num=cards[i].querySelector('.num'),per=cards[i].querySelector('.per'),note=cards[i].parentNode.querySelector('.js-note');
+      if(annual){num.textContent=Math.round(a/12);per.textContent='/mo';if(note)note.innerHTML='$'+a+'/yr · <b>save $'+(m*12-a)+'</b>';}
+      else{num.textContent=m;per.textContent='/mo';if(note)note.textContent='Billed monthly';}}
+  }
+  billMonthly.addEventListener('click',function(){billing='monthly';renderPrices();});
+  billAnnual.addEventListener('click',function(){billing='annual';renderPrices();});
+
+  function amountFor(card){var el=card.querySelector('.amt[data-m]');return billing==='annual'?el.getAttribute('data-a'):el.getAttribute('data-m');}
+  var btns=document.querySelectorAll('.cta');
+  for(var i=0;i<btns.length;i++){btns[i].addEventListener('click',function(){
+    var plan=this.getAttribute('data-plan');
+    if(this.getAttribute('data-free')){toast('You\u2019re on Apprentice — ask away');window.location.href='/';return;}
+    var amount=amountFor(this.closest('.card'));
+    if(!PAYPAL_ME||PAYPAL_ME==='YOUR-PAYPAL-HANDLE'){toast('Set your PayPal handle to switch on checkout');return;}
+    toast('Opening PayPal — '+plan+' ($'+amount+')');
+    window.open('https://www.paypal.com/paypalme/'+encodeURIComponent(PAYPAL_ME)+'/'+amount+PAYPAL_CURRENCY,'_blank','noopener');
+  });}
+
+  // PayPal Smart Buttons
+  function loadSDK(cb){if(window.paypal){cb(true);return;}if(!PAYPAL_CLIENT_ID||PAYPAL_CLIENT_ID==='YOUR-PAYPAL-CLIENT-ID'){cb(false);return;}
+    var s=document.createElement('script');s.src='https://www.paypal.com/sdk/js?client-id='+encodeURIComponent(PAYPAL_CLIENT_ID)+'&currency='+encodeURIComponent(PAYPAL_CURRENCY);
+    s.onload=function(){cb(!!window.paypal);};s.onerror=function(){cb(false);};document.head.appendChild(s);}
+  function renderSmart(){if(!window.paypal)return;var slots=document.querySelectorAll('.paypal-slot');
+    for(var i=0;i<slots.length;i++){(function(slot){var card=slot.closest('.card'),plan=slot.getAttribute('data-plan'),fb=card.querySelector('.cta');
+      if(fb)fb.style.display='none';slot.innerHTML='';
+      try{window.paypal.Buttons({style:{layout:'vertical',color:'gold',shape:'rect',label:'paypal',height:46},
+        createOrder:function(d,actions){return actions.order.create({purchase_units:[{description:'TradeSquare '+plan+' ('+billing+')',amount:{value:parseFloat(amountFor(card)).toFixed(2),currency_code:PAYPAL_CURRENCY}}]});},
+        onApprove:function(d,actions){return actions.order.capture().then(function(det){var nm=(det&&det.payer&&det.payer.name&&det.payer.name.given_name)||'';toast('Paid up'+(nm?', '+nm:'')+' — you\u2019re on '+plan);});},
+        onError:function(){toast('PayPal hiccup — try again');}}).render(slot);
+        setTimeout(function(){if(slot.children.length===0&&fb)fb.style.display='';},2400);
+      }catch(e){if(fb)fb.style.display='';}
+    })(slots[i]);}
+  }
+  renderPrices();
+  loadSDK(function(ok){if(ok)renderSmart();});
+})();
+</script>
+
+<script src="/support-widget.js" defer></script>

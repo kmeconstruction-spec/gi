@@ -2,6 +2,18 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>TradeSquare — Plan Takeoff</title>
+<meta name="description" content="Upload a plan-set PDF and get an AI material takeoff — quantities, dimensions, and counts pulled straight from your blueprints. A TradeSquare Master feature." />
+<meta name="robots" content="index, follow" />
+<meta name="theme-color" content="#0E1116" />
+<link rel="canonical" href="https://tradesqai.com/takeoff.html" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="TradeSquare" />
+<meta property="og:title" content="TradeSquare — Plan Takeoff" />
+<meta property="og:description" content="Upload a plan-set PDF and get an AI material takeoff — quantities, dimensions, and counts pulled straight from your blueprints. A TradeSquare Master feature." />
+<meta property="og:url" content="https://tradesqai.com/takeoff.html" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="TradeSquare — Plan Takeoff" />
+<meta name="twitter:description" content="Upload a plan-set PDF and get an AI material takeoff — quantities, dimensions, and counts pulled straight from your blueprints. A TradeSquare Master feature." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Barlow:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -102,11 +114,11 @@
 </style>
 
 <div class="bar">
-  <a class="brand" href="/"><span class="brand-sq" aria-hidden="true"></span><span class="brand-name">TRADE<b>SQUARE</b></span><span class="badge">Takeoff · Master</span></a>
+  <a class="brand" href="/app"><span class="brand-sq" aria-hidden="true"></span><span class="brand-name">TRADE<b>SQUARE</b></span><span class="badge">Takeoff · Master</span></a>
   <div class="bar-right">
     <span class="meter" id="meter"></span>
     <button class="btn" id="savedBtn" type="button">📁 Saved</button>
-    <a class="btn" href="/">← App</a>
+    <a class="btn" href="/app">← App</a>
   </div>
 </div>
 
@@ -216,10 +228,10 @@
     if(!sb){showGate('<div class="mk"></div><h1>Not available</h1><p>Login is not switched on.</p>');return;}
     sb.auth.getSession().then(function(r){
       var s=r.data.session;
-      if(!s){showGate('<div class="mk"></div><h1>Log in first</h1><p>Plan Takeoff is a Master feature. Log in on the app, then come back.</p><a class="btn solid" href="/">Go to the app</a>');return;}
+      if(!s){showGate('<div class="mk"></div><h1>Log in first</h1><p>Plan Takeoff is a Master feature. Log in on the app, then come back.</p><a class="btn solid" href="/app">Go to the app</a>');return;}
       user=s.user;token=s.access_token;
       return tkFetch('status').then(function(st){
-        if(!st||st.error){showGate('<div class="mk"></div><h1>Setup needed</h1><p>'+esc((st&&st.error)||'No response from the takeoff function.')+'</p><a class="btn" href="/">← App</a>');return;}
+        if(!st||st.error){showGate('<div class="mk"></div><h1>Setup needed</h1><p>'+esc((st&&st.error)||'No response from the takeoff function.')+'</p><a class="btn" href="/app">← App</a>');return;}
         status=st;renderMeter();
         if(!st.master){
           showGate('<div class="mk"></div><h1>Master feature</h1><p>Plan Takeoff reads your blueprints and pulls a material list automatically. It is part of the <b>Master</b> plan.</p><a class="btn solid" href="/pricing.html">See Master plan</a>');
@@ -228,7 +240,7 @@
         el('gate').classList.add('hidden');el('tool').classList.remove('hidden');
       });
     }).catch(function(e){
-      showGate('<div class="mk"></div><h1>Could not load</h1><p>'+esc(String((e&&e.message)||e))+'</p><p style="font-size:13px">If this mentions the takeoff function, make sure <b>netlify/functions/takeoff.js</b> is deployed and the service-role key is set, then redeploy.</p><a class="btn" href="/">← App</a>');
+      showGate('<div class="mk"></div><h1>Could not load</h1><p>'+esc(String((e&&e.message)||e))+'</p><p style="font-size:13px">If this mentions the takeoff function, make sure <b>netlify/functions/takeoff.js</b> is deployed and the service-role key is set, then redeploy.</p><a class="btn" href="/app">← App</a>');
     });
   }
 
