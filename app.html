@@ -457,7 +457,7 @@
       toggleWrap=document.getElementById('authToggle');
   var mode='login', sb=null;
   var configured = (typeof window.supabase!=='undefined') && SUPABASE_URL!=='YOUR-SUPABASE-URL' && SUPABASE_ANON_KEY!=='YOUR-SUPABASE-ANON-KEY';
-  if(configured){ sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY); }
+  if(configured){ sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{detectSessionInUrl:true,persistSession:true,autoRefreshToken:true,flowType:'implicit'}}); }
 
   function msg(t,cls){msgEl.textContent=t||'';msgEl.className='auth-msg'+(cls?' '+cls:'');}
   function wireSwitch(){var s=document.getElementById('authSwitch');if(s)s.addEventListener('click',function(){setMode(mode==='login'?'signup':'login');});}
@@ -511,6 +511,21 @@
   if(sb){
     sb.auth.getSession().then(function(res){updateUI(res.data.session);});
     sb.auth.onAuthStateChange(function(_e,session){updateUI(session);});
+    // OAuth return: the token lands in the URL hash/query. Give the client a moment
+    // to consume it, then re-check and tidy the address bar.
+    if(/[#?].*(access_token|code|error)=/.test(window.location.href)){
+      var tries=0;
+      var poll=setInterval(function(){
+        tries++;
+        sb.auth.getSession().then(function(res){
+          if(res.data.session){
+            updateUI(res.data.session);
+            clearInterval(poll);
+            try{history.replaceState({}, document.title, window.location.pathname);}catch(e){}
+          }else if(tries>=10){clearInterval(poll);}
+        });
+      },300);
+    }
   }
 })();
 </script>
